@@ -1,6 +1,6 @@
 # CMG 3D • 4D Workspace
 
-รุ่นทดลอง 0.1 — Vite + React + TypeScript + Three.js / React Three Fiber / Drei
+รุ่นทดลอง 0.2 — Vite + React + TypeScript + Three.js / React Three Fiber / Drei
 
 ## Run locally
 
@@ -34,3 +34,11 @@ Multiple independent projects; parametric concrete members; XYZ views; orbit, zo
 ## Next phase
 
 Firebase Auth, project memberships, Firestore/Storage and tested security rules; immutable model version snapshots; evidence-linked PDF review; IFC adapter; per-element activity links; backend jobs and reviewed AI extraction.
+
+## Responsive layout
+
+- Under 700 CSS px: one panel with persistent bottom navigation and 3D/4D mode controls.
+- 700–1199 CSS px: live model beside a switchable project/property panel.
+- From 1200 CSS px: three-panel desktop workspace.
+- Coarse-pointer devices get touch targets and larger form text. Safe-area insets and dynamic viewport heights are used. Orientation/viewport changes refit the camera; orthographic zoom follows available canvas size.
+- TypeScript/build verified. Physical iPhone/iPad and browser visual QA have not been performed in this environment.
