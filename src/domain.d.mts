@@ -1,0 +1,12 @@
+export type Category = 'footing'|'pedestal'|'column'|'beam'|'slab';
+export type Element = {id:string;category:Category;name:string;position:[number,number,number];size:[number,number,number];zone:string;material:string;source:string;revision:number};
+export type Activity = {id:string;name:string;start:string;end:string;categories:Category[]};
+export type Project = {id:string;name:string;description:string;elements:Element[];activities:Activity[];documents:{id:string;name:string;size:number;type:string}[];audit:{at:string;message:string}[];updatedAt:string};
+export const categories:Category[];
+export const labels:Record<string,string>;
+export const dateRange:{start:string;end:string};
+export function dayNumber(date:string):number;
+export function activityState(activity:{start:string;end:string},date:string):string;
+export function demoProject(name?:string):Project;
+export function validateElement(e:unknown):boolean;
+export function validateProject(p:unknown):boolean;
