@@ -3,3 +3,4 @@ dist/
 .sites-runtime/
 .env*
 !.env.example
+.qa/

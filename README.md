@@ -1,44 +1,52 @@
-# CMG 3D • 4D Workspace
+# CMG 3D • 4D Platform — 0.3
 
-รุ่นทดลอง 0.2 — Vite + React + TypeScript + Three.js / React Three Fiber / Drei
+ระบบเริ่มต้นจากบทสนทนา “แนะนำขั้นตอน Web App 3D 4D” ใช้ Vite + React + TypeScript + Three.js / React Three Fiber และ Firebase SDK
 
-## Run locally
+## เปิดใช้งานบน Windows
 
-Install a Node.js version compatible with the locked dependencies, then:
+ดับเบิลคลิก Start-CMG.cmd แล้วเปิด http://localhost:5173 หรือใช้:
 
-```sh
+```powershell
 npm ci
-npm run dev
+npm run dev -- --port 5173 --strictPort
 ```
 
-```sh
+เปิดหน้าต่างคำสั่งค้างไว้ระหว่างใช้งาน หยุดเว็บด้วย Ctrl+C
+
+ไฟล์ .env เตรียมไว้ให้เติม Firebase config เองและถูกละเว้นจาก Git ตัวอย่างอยู่ใน .env.example หากยังไม่เติม ใช้งาน Local ได้ทันที หลังเติมต้อง restart เว็บ ดู [คู่มือ Firebase](docs/FIREBASE_SETUP.md)
+
+## ใช้งานได้แล้ว
+
+- หลายโครงการ แยกโมเดล แผนงาน คำอธิบาย และไฟล์แนบ
+- XYZ ทั้งหกทิศและ Isometric, หมุน ซูม เลื่อนกล้อง, Fit model ตามขนาด/ตำแหน่งจริง, Perspective/Orthographic
+- เลือกและไฮไลต์ชิ้นส่วน ซ่อนตามประเภท แยกดู โปร่งใส และตัดโมเดลที่ Z=2m
+- เพิ่มฐานราก ตอม่อ เสา คาน และพื้น แก้ชื่อ ขนาด XYZ ตำแหน่ง วัสดุ โซน แหล่งอ้างอิง พร้อม revision/ประวัติการแก้ไข
+- แนบ PDF/ภาพ/DWG/DXF/IFC สูงสุด 50 MB ต่อไฟล์ เปิด PDF/ภาพ และดาวน์โหลดไฟล์อ้างอิง
+- แก้ชื่อ/วันที่กิจกรรม เพิ่มกิจกรรม เลือกชิ้นส่วนที่เชื่อมรายตัว หนึ่งชิ้นเชื่อมหลายกิจกรรมได้ รองรับไฟล์เดิมที่ผูกตามประเภท
+- Play/Pause 4D หรือเลือกวันที่: อนาคตจาง กำลังทำเหลือง เสร็จตามแผนเขียว
+- บันทึกโมเดลใน localStorage และไฟล์ใน IndexedDB ส่งออก/นำเข้า JSON
+- เตรียม Firebase Google Login, Firestore metadata และ Storage สำหรับบันทึกรุ่นพร้อมไฟล์แนบ เปิดรุ่นบนอุปกรณ์อื่นด้วยบัญชีเดิมเป็นสำเนาใหม่
+- หน้าจอปรับตาม desktop/tablet/phone
+
+## ขอบเขตปัจจุบัน
+
+- Local เก็บเฉพาะ browser/device/origin การเปลี่ยน localhost เป็น IP ถือเป็นคนละแหล่งเก็บ JSON ไม่มีไฟล์แนบ ต้องดาวน์โหลดแยกหรือบันทึกบน Cloud
+- Firebase ต้องเติม config เปิดบริการ ตั้งค่า Rules/CORS และทดสอบด้วยบัญชีจริงก่อนใช้ ยังไม่ได้เชื่อม Firebase ของผู้ใช้
+- Cloud เก็บรุ่นแบบกดบันทึก ไม่มี realtime collaboration หรือสิทธิ์ทีม/องค์กร ทุกบัญชีเห็นเฉพาะรุ่นของตน
+- PDF/ภาพเป็นแบบอ้างอิง ยังไม่มี AI อ่านแบบสร้างโมเดลอัตโนมัติ DWG/DXF/IFC ยังไม่ parse geometry
+- โมเดลตัวอย่างและเหล็กเสริมเป็นภาพสาธิต ไม่ใช่แบบออกแบบหรือ BBS
+- หน่วยภายในเป็นเมตร Z ขึ้น ตำแหน่งคือจุดศูนย์กลางชิ้นส่วน
+- 4D เป็นสถานะตามแผน ไม่มี Actual/เปอร์เซ็นต์งานจริง หากหลายกิจกรรม: active เมื่อมีงานกำลังทำ, done เมื่อทุกกิจกรรมเสร็จ
+
+## ตรวจระบบ
+
+```powershell
 npm test
 npm run build
 ```
 
-## Implemented
+UI QA: ติดตั้ง Playwright และ Chromium ในสภาพแวดล้อม QA แล้วรัน node scripts/smoke.mjs ขณะเว็บเปิดพอร์ต 5173 หรือส่ง absolute path ของ Playwright เป็นอาร์กิวเมนต์แรก ภาพอยู่ใน .qa/ (ไม่เข้า Git)
 
-Multiple independent projects; parametric concrete members; XYZ views; orbit, zoom, pan; perspective/orthographic; category visibility; isolation; transparency; section plane at Z=2m; illustrative reinforcement; dimensions and centroid editing; local audit; local model persistence; JSON import/export; document attachments through IndexedDB; image/PDF preview; editable category-linked schedule and 4D timeline.
+## งานระยะถัดไป
 
-## Boundaries
-
-- Sample geometry is illustrative, not an engineered design.
-- Canonical unit: metres. Z up. Position means member centroid.
-- localStorage stores model metadata, IndexedDB stores attachments, per browser/device/origin. Firebase is not connected; clearing browser data removes local data. Export JSON and download attachments separately to back up.
-- JSON exports contain model/schedule metadata, not attachment bytes. Imports omit attachment entries.
-- CAD/IFC files can be attached/downloaded, not parsed. PDF/images are viewed, not automatically interpreted. AI is not connected.
-- Reinforcement is visual demonstration, not BBS or design.
-- 4D links activities by category, displays planned states only, with inclusive calendar start/end dates. Future members are ghosted, active yellow, completed green.
-- Owner-private hosting does not add a team role/authorization system.
-
-## Next phase
-
-Firebase Auth, project memberships, Firestore/Storage and tested security rules; immutable model version snapshots; evidence-linked PDF review; IFC adapter; per-element activity links; backend jobs and reviewed AI extraction.
-
-## Responsive layout
-
-- Under 700 CSS px: one panel with persistent bottom navigation and 3D/4D mode controls.
-- 700–1199 CSS px: live model beside a switchable project/property panel.
-- From 1200 CSS px: three-panel desktop workspace.
-- Coarse-pointer devices get touch targets and larger form text. Safe-area insets and dynamic viewport heights are used. Orientation/viewport changes refit the camera; orthographic zoom follows available canvas size.
-- TypeScript/build verified. Physical iPhone/iPad and browser visual QA have not been performed in this environment.
+สมาชิกองค์กรและบทบาทผู้ใช้งาน, workflow ตรวจ/อนุมัติรุ่น, CSV schedule import, โมเดล IFC, การอ่าน PDF พร้อมหลักฐานอ้างอิงและจุดตรวจยืนยัน, backend AI/jobs และทดสอบ Firebase Rules ด้วย emulator
