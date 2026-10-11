@@ -1,0 +1,8 @@
+import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
+import {doc,setDoc} from 'firebase/firestore';
+import {ref,uploadBytes,getBytes} from 'firebase/storage';
+import fs from 'node:fs/promises';
+const env=await initializeTestEnvironment({projectId:'demo-cmg-auth',firestore:{host:'127.0.0.1',port:8280},storage:{host:'127.0.0.1',port:9199,rules:await fs.readFile('storage.rules','utf8')}});
+try{await env.withSecurityRulesDisabled(async c=>{const d=c.firestore();for(const [uid,role,status] of [['storage-owner','Staff','approved'],['storage-other','Staff','approved'],['storage-pending','Staff','pending']])await setDoc(doc(d,'CMG-4D-Platform','root','users',uid+'@example.test'),{uid,role:[role],status});await setDoc(doc(d,'CMG-4D-Platform','root','projects','storage-test'),{ownerUid:'storage-owner',memberUids:['storage-owner']});});
+ const context=uid=>env.authenticatedContext(uid,{email:uid+'@example.test'}).storage();const file='CMG-4D-Platform/root/projects/storage-test/files/test.txt';const owner=context('storage-owner'),other=context('storage-other'),pending=context('storage-pending');await assertSucceeds(uploadBytes(ref(owner,file),new TextEncoder().encode('test')));await assertSucceeds(getBytes(ref(owner,file)));await assertFails(getBytes(ref(other,file)));await assertFails(uploadBytes(ref(pending,file+'-new'),new Uint8Array([1])));await assertFails(uploadBytes(ref(owner,file),new Uint8Array([2])));console.log('PASS Storage: approved member upload/read, unrelated and pending access denied, files immutable');
+}finally{await env.cleanup();}

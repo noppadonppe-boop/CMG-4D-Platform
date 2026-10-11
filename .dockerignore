@@ -1,0 +1,15 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+*.log
+.qa
+.gcloud-config
+.gcloud/
+.config/
+.firebase/
+.sites-runtime
+coverage

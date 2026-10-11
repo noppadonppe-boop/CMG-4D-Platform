@@ -1,7 +1,7 @@
 import {initializeApp} from 'firebase/app';
-import {getAuth, GoogleAuthProvider, signInWithPopup, signOut} from 'firebase/auth';
-import {getFirestore, collection, doc, getDocs, query, orderBy, setDoc, serverTimestamp} from 'firebase/firestore';
-import {getStorage, ref, uploadBytes, getBlob} from 'firebase/storage';
+import {getAuth, connectAuthEmulator, GoogleAuthProvider, signInWithPopup, signOut} from 'firebase/auth';
+import {getFirestore, connectFirestoreEmulator, collection, doc, getDocs, query, orderBy, setDoc, serverTimestamp} from 'firebase/firestore';
+import {getStorage, connectStorageEmulator, ref, uploadBytes, getBlob} from 'firebase/storage';
 import {validateProject, type Project} from './domain.mjs';
 
 const env = import.meta.env;
@@ -10,11 +10,13 @@ const config = {apiKey: env.VITE_FIREBASE_API_KEY, authDomain: env.VITE_FIREBASE
 export const cloudConfigured = Object.values(config).every(v => typeof v === 'string' && v.trim());
 const app = cloudConfigured ? initializeApp(config) : null;
 export const auth = app ? getAuth(app) : null;
-const db = app ? getFirestore(app) : null;
-const storage = app ? getStorage(app) : null;
+export const db = app ? getFirestore(app) : null;
+if(import.meta.env.VITE_FIREBASE_EMULATORS==='1'&&auth&&db){connectAuthEmulator(auth,'http://127.0.0.1:9299',{disableWarnings:true});connectFirestoreEmulator(db,'127.0.0.1',8280)}
+export const storage = app ? getStorage(app) : null;
+if(import.meta.env.VITE_FIREBASE_EMULATORS==='1'&&storage)connectStorageEmulator(storage,'127.0.0.1',9199);
 export type Snapshot = {id: string; name: string; projectId: string; elementCount: number; documentCount: number; createdAt: string};
-export const login = () => {if (!auth) throw Error('ยังไม่ได้ตั้งค่า Firebase'); return signInWithPopup(auth, new GoogleAuthProvider());};
-export const logout = () => auth ? signOut(auth) : Promise.resolve();
+export const login = async () => (await import('./authService')).loginWithGoogle();
+export const logout = async () => (await import('./authService')).logout();
 function owner() {if (!auth?.currentUser || !db || !storage) throw Error('กรุณาเข้าสู่ระบบ'); return auth.currentUser.uid;}
 export async function listSnapshots(): Promise<Snapshot[]> {
   const uid = owner();

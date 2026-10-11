@@ -1,0 +1,55 @@
+substitutions:
+  _REGION: asia-southeast1
+  _SERVICE: cmg-4d-api
+  _REPOSITORY: cmg
+  _STORAGE_BUCKET: cmg-4d-platform.firebasestorage.app
+  _AGENT_TRIGGER_ID: ''
+  _RUNTIME_SERVICE_ACCOUNT: cmg-api-runtime@cmg-4d-platform.iam.gserviceaccount.com
+  _TASK_QUEUE: cmg-mcp
+  _MCP_PUBLIC_URL: ''
+  _IMAGE_TAG: manual
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_SERVICE}:${_IMAGE_TAG}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_SERVICE}:${_IMAGE_TAG}
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_SERVICE}:${_IMAGE_TAG}
+      - --region=${_REGION}
+      - --platform=managed
+      - --allow-unauthenticated
+      - --service-account=${_RUNTIME_SERVICE_ACCOUNT}
+      - --port=8080
+      - --memory=2Gi
+      - --cpu=2
+      - --timeout=3600
+      - --min-instances=0
+      - --max-instances=10
+      - --update-env-vars=NODE_ENV=production,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},VITE_FIREBASE_PROJECT_ID=${PROJECT_ID},VITE_FIREBASE_STORAGE_BUCKET=${_STORAGE_BUCKET},MCP_PUBLIC_URL=${_MCP_PUBLIC_URL},MCP_TASK_QUEUE=projects/${PROJECT_ID}/locations/${_REGION}/queues/${_TASK_QUEUE},WORKSPACE_AGENT_API_BASE=https://api.chatgpt.com/v1,WORKSPACE_AGENT_TRIGGER_ID=${_AGENT_TRIGGER_ID}
+      - --update-secrets=MCP_SERVER_TOKEN=mcp-server-token:latest,MCP_SCOPE_SECRET=mcp-scope-secret:latest
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        if [[ -n "${_MCP_PUBLIC_URL}" ]]; then
+          mcp_url="${_MCP_PUBLIC_URL}"
+        else
+          mcp_url="$(gcloud run services describe "${_SERVICE}" --region="${_REGION}" --format="value(status.url)")"
+        fi
+        gcloud run services update "${_SERVICE}" --region="${_REGION}" --update-env-vars="MCP_PUBLIC_URL=${mcp_url}"
+
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_SERVICE}:${_IMAGE_TAG}

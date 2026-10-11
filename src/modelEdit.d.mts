@@ -1,0 +1,12 @@
+import type {Element, Project} from './domain.mjs';
+export type EditContext = {projectId: string; summary: {name: string; description: string; totalElements: number; units: string; axis: string}; targetIds: string[]; elements: Element[]};
+export type ModelPatch = {updates: {id: string; changes: Partial<Omit<Element, 'id' | 'revision'>>}[]; adds: Element[]; removes: string[]; notes: string[]};
+export const MAX_EDIT_TARGETS: number;
+export const MAX_EDIT_CONTEXT: number;
+export const MAX_EDIT_OPERATIONS: number;
+export function resolveEditTargets(project: Project, options: {prompt: string; selectedId?: string; scope?: 'auto' | 'selected'}): Element[];
+export function buildEditContext(project: Project, options: {prompt: string; selectedId?: string; scope?: 'auto' | 'selected'}): EditContext;
+export function validateEditContext(context: unknown): EditContext;
+export function normalizeEditPatch(patch: ModelPatch, context: EditContext): ModelPatch;
+export function validateEditPatch(patch: unknown, context: EditContext): ModelPatch;
+export function applyEditPatch(project: Project, patch: ModelPatch, context: EditContext): Project;

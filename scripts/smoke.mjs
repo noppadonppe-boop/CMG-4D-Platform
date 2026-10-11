@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 const {chromium}=await import(process.argv[2]?pathToFileURL(process.argv[2]).href:'playwright');
-const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
+const browser=await chromium.launch({headless:true,channel:process.env.QA_CHANNEL||'msedge',args:['--enable-unsafe-swiftshader']});
 const context=await browser.newContext({viewport:{width:1440,height:1000}});
 const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
 await fs.mkdir('.qa',{recursive:true});
 try {
- await page.goto('http://127.0.0.1:5173');
+ await page.goto(process.env.QA_URL||'http://127.0.0.1:5174');
  await page.locator('canvas').waitFor();await page.waitForTimeout(1500);
  assert.equal(await page.getByText('เปิดโมเดล 3D ไม่สำเร็จ').count(),0);
  await page.getByRole('spinbutton').first().fill('2.5');
@@ -26,7 +26,7 @@ try {
  const data=await page.evaluate(()=>JSON.parse(localStorage.getItem('cmg-workspace-v1')));
  assert.deepEqual(data[0].activities.at(-1).elementIds,['F-001']);
  await page.getByRole('button',{name:'Cloud',exact:true}).click();
- await page.getByText('พร้อมตั้งค่า Firebase',{exact:true}).waitFor();
+ await page.locator('.modal').getByRole('heading',{name:'รุ่นโครงการบน Firebase'}).waitFor();
  await page.getByRole('button',{name:'ปิด',exact:true}).click();
  await page.locator('input[type=file]').first().setInputFiles({name:'reference.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jD1kAAAAASUVORK5CYII=','base64')});
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('cmg-workspace-v1'))[0].documents.length===1);

@@ -1,5 +1,7 @@
 # ตั้งค่า Firebase สำหรับ CMG 4D Platform
 
+> ระบบล่าสุดเพิ่ม Authentication, การอนุมัติ, หลาย Role, การแชร์โครงการ และ Realtime แล้ว โปรดใช้ [คู่มือ Authentication ปัจจุบัน](AUTHENTICATION.md) เป็นขั้นตอนหลัก เนื้อหาด้านล่างอธิบายระบบ snapshot เดิมที่ยังเก็บไว้สำหรับเปิดสำเนา
+
 เวอร์ชันนี้แก้ไขงานในเบราว์เซอร์ และเก็บรุ่นบน Firebase แบบกดบันทึก แต่ละรุ่นประกอบด้วยโมเดล แผนงาน คำอธิบาย และไฟล์แนบ เปิดจากอุปกรณ์อื่นเป็นสำเนาใหม่ได้ ไม่มีการเขียนทับรุ่นเดิมหรือซิงก์การแก้ไขอัตโนมัติ
 
 ## ตั้งค่าครั้งแรก
@@ -39,3 +41,9 @@ gcloud storage buckets update gs://YOUR_BUCKET_NAME --cors-file=storage.cors.exa
 ## สถานะการทดสอบ
 
 TypeScript และ build ตรวจได้โดยไม่มี config แต่ Google login, Firestore, Storage, CORS และการบังคับ Rules ต้องทดสอบใน Firebase ของผู้ใช้ก่อนใช้ข้อมูลโครงการจริง ยังไม่ได้รับรอง multi-user production
+
+## Admin API Keys
+
+เข้า Admin → เข้าสู่ระบบด้วย Google → วาง Key ของ OpenAI / Anthropic / Google AI Studio → บันทึก Key สามารถเปลี่ยนหรือลบได้จากการ์ดของค่ายนั้น ช่องแชทเลือกค่าย โมเดล และระดับการคิดก่อนส่งข้อความ โดยใช้ Key ที่อ่านล่าสุดจาก Firestore
+
+Firestore path: `CMG-4D-Platform/root/users/{masterEmail}/apiKeys/{provider}` มี `apiKey` และ `updatedAt` เฉพาะ MasterAdmin ที่ได้รับอนุมัติเท่านั้นที่บันทึก เปลี่ยน หรือลบ Key ได้ แยกเอกสารตาม `openai`, `anthropic`, และ `google`

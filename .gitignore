@@ -1,6 +1,31 @@
+# Dependencies and build output
 node_modules/
 dist/
+coverage/
 .sites-runtime/
+
+# Local environment files and secrets
 .env*
 !.env.example
+*.local
+*.pem
+*.key
+*.p12
+*service-account*.json
+*firebase-adminsdk*.json
+credentials*.json
+client_secret*.json
+
+# Local tool state, caches, credentials, and test artifacts
+.config/
+.firebase/
+.gcloud/
+.gcloud-config/
 .qa/
+.aetox-attachments/
+
+# Logs and debug output
+*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

@@ -1,18 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid}/snapshots/{snapshotId} {
-      function owner() { return request.auth != null && request.auth.uid == uid; }
-      allow read: if owner();
-      allow create: if owner()
-        && request.resource.data.keys().hasOnly(['name', 'projectId', 'createdAt', 'elementCount', 'documentCount', 'schemaVersion'])
-        && request.resource.data.name is string && request.resource.data.name.size() <= 500
-        && request.resource.data.projectId is string && request.resource.data.projectId.size() <= 200
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.schemaVersion == 1
-        && request.resource.data.elementCount is int && request.resource.data.elementCount >= 0 && request.resource.data.elementCount <= 10000
-        && request.resource.data.documentCount is int && request.resource.data.documentCount >= 0 && request.resource.data.documentCount <= 200;
-      allow update, delete: if false;
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }
